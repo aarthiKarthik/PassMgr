@@ -34,15 +34,21 @@
 	        <p class="event received">Device is Ready</p>
 	    </div>
 	</div>
+    <script src="http://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+    <script type="text/javascript" src="js/components/core-min.js "></script>
+    <script type="text/javascript" src="js/rollups/aes.js"></script>
+    <script type="text/javascript" src="js/components/cipher-core-min.js"></script>
+    <script type="text/javascript" src="js/components/enc-base64-min.js"></script>
+    <script type="text/javascript" src="js/rollups/pbkdf2.js"></script>
+    <script type="text/javascript" src="js/components/enc-utf8-min.js"></script>
+
+    <script type="text/javascript" src="js/index.js"></script>
+
     <script type="text/javascript" src="cordova.js"></script>
-    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css"/>
 
-  <script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
-  <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/pbkdf2.js"></script>
-  <script type="text/javascript" src="js/index.js"></script>
   <style>
   @-ms-viewport { width: 100vw ; zoom: 100% ; }
   @viewport { width: 100vw ; zoom: 100% ; }
@@ -50,7 +56,7 @@
   @viewport { user-zoom: fixed ; }
   </style>
 
-  <div data-role="page" id="pageone">
+  <div data-role="page" id="homepage">
     <div data-role="header">
       <h1>Access</h1>
     </div>
@@ -58,25 +64,32 @@
     <div data-role="main" class="ui-content">
       <p style="text-align: center">Enter Master Passphrase</p>
       <input type="password" id="master_password" autofocus/>
+      <br>
+      <p style="text-align: center">Hint</p>
+      <input type="text" id="hint" placeholder="Hint"/>
+      <br>
       <a href="javascript:store_master_password()" style="text-decoration: none"><button>Submit</button></a>
-      <a href="javascript:show_hint()" style="text-decoration: none"><button>Submit</button></a>
+      <br>
+      <a href="javascript:navigator.app.exitApp()" style="text-decoration: none"><button>Exit App</button></a>
+      <!-- <a href="javascript:show_hint()" style="text-decoration: none"><button>Submit</button></a>-->
     </div>
   </div>
 
   <div data-role="page" id="pagetwo">
     <div data-role="header">
       <h1>Home</h1>
-      <a href="#pageone" class="ui-btn ui-btn-right ui-icon-action ui-btn-icon-right">Logout</a>
+      <a href="#homepage" class="ui-btn ui-btn-right ui-icon-action ui-btn-icon-right">Logout</a>
     </div>
 
     <div data-role="main" class="ui-content">
-      <a href="#pagethree" style="text-decoration: none"><button>Add New Password</button></a>
-      <a href="javascript:display_list();" style="text-decoration: none"><button>Show Password List</button></a>
+      <a href="#pagethree" style="text-decoration: none" onclick="javascript:reset_all_fields();"><button>Add New Password</button></a>
+      <a href="#pagefour" style="text-decoration: none"><button>Show Password List</button></a>
+
       <br><h3><span>Advanced Features</span></h3>
       <a href="javascript:clear_items_but_salt();" style="text-decoration: none"><button>Remove All Passwords</button></a>
       <br>
-      <a href="#pagefive" style="text-decoration: none"><button>Change Master Passphrase</button></a>
-      <br>
+      <!--<a href="#pagefive" style="text-decoration: none"><button>Change Master Passphrase</button></a>-->
+      <!--<br>-->
       <a href="javascript:save_text_as_file();" style="text-decoration: none"><button>Backup Passwords</button></a>
       <a href="javascript:restore_file_contents();" style="text-decoration: none"><button>Restore Passwords</button></a>
       <br><hr>
@@ -88,13 +101,32 @@
     <div data-role="header">
       <a href="#pagetwo" class="ui-btn ui-icon-home ui-btn-icon-left">Home</a>
       <h1>Add</h1>
-      <a href="#pageone" class="ui-btn ui-btn-right ui-icon-action ui-btn-icon-right">Logout</a>
+      <a href="#homepage" class="ui-btn ui-btn-right ui-icon-action ui-btn-icon-right">Logout</a>
     </div>
 
     <div data-role="main" class="ui-content">
-      <input type="text" placeholder="Username" id="new_name" autofocus/>
+      <p id="noItemSpan">Details</p>
+      <select id="typeSelect">
+        <option>Service Login Details</option>
+        <option>Credit/Debit Cards</option>
+        <option>Websites</option>
+        <option>Bank Accounts</option>
+        <option>Others</option>
+      </select>
+
+      <input type="text" placeholder="Service Name" id="service_name"/>
+      <input type="text" placeholder="Username" id="new_name"/>
       <input type="text" placeholder="Password" id="new_password" />
-      <input type="submit" placeholder="Add to List" onclick="new_entry();" value="Submit" />
+      <input type="url" placeholder="URL" id="url"/>
+      <input type="email" placeholder="Email" id="email"/>
+      <input type="number" placeholder="Credit/Debit Card Number" id="card_num" maxlength="16"/>
+      <input type="number" placeholder="PIN" id="card_pin" maxlength="8"/>
+      <br>
+      <button onclick="javascript:new_entry();" id="sub"> Submit </button>
+      <button onclick="javascript:update_entry();" id="upd">Update</button>
+      <!--<input type="submit" placeholder="Update Item" onclick="update_entry();" value="Update" id="upd"/>-->
+      <button onclick="javascript:reset_all_fields();" id="reset">Reset</button>
+      <button onclick="javascript:remove_item();" id="delete">Delete Item</button>
     </div>
   </div>
 
@@ -102,16 +134,47 @@
     <div data-role="header">
       <a href="#pagetwo" class="ui-btn ui-icon-home ui-btn-icon-left">Home</a>
       <h1>List</h1>
-      <a href="#pageone" class="ui-btn ui-btn-right ui-icon-action ui-btn-icon-right">Logout</a>
+      <a href="#homepage" class="ui-btn ui-btn-right ui-icon-action ui-btn-icon-right">Logout</a>
     </div>
 
     <div data-role="main" class="ui-content">
-      <form class="ui-filterable">
-        <input id="myFilter" data-type="search">
-      </form>
-      <ul id="ul_list" onclick="ul_on_click();" data-role="listview" data-filter="true" data-input="#myFilter" data-inset="true">
+      <ul class="tab">
+        <li><a href="javascript:void(0)" class="tablinks" onclick="openTab(event, 'All');" id="defaultOpen">All</a></li>
+        <li><a href="javascript:void(0)" class="tablinks" onclick="openTab(event, 'Recent');">Recently Viewed</a></li>
       </ul>
-      <input type="submit" onclick="remove_item();" value="Remove Item" />
+      <div id="All" class="tabcontent">
+        <!-- <span onclick="this.parentElement.style.display='none'" class="topright">x</span>-->
+       <ul id="type_list" data-role="listview" >
+          <li><a href="javascript:on_click_type(0)">Service Login Details</a></li>
+          <li><a href="javascript:on_click_type(1)">Credit/Debit Cards</a></li>
+          <li><a href="javascript:on_click_type(2)">Websites</a></li>
+          <li><a href="javascript:on_click_type(3)">Bank Accounts</a></li>
+          <li><a href="javascript:on_click_type(4)">Others</a></li>
+       </ul>
+      </div>
+      <div id="Recent" class="tabcontent">
+        <!-- <span onclick="this.parentElement.style.display='none'" class="topright">x</span>-->
+        <p>Under Construction.</p>
+      </div>
+    </div>
+  </div>
+
+  <div data-role="page" id="pagesix">
+    <div data-role="header">
+      <a href="#pagetwo" class="ui-btn ui-icon-home ui-btn-icon-left">Home</a>
+      <h1>List</h1>
+      <a href="#homepage" class="ui-btn ui-btn-right ui-icon-action ui-btn-icon-right">Logout</a>
+    </div>
+
+    <div data-role="main" class="ui-content">
+      <!-- <form class="ui-filterable">
+        <input id="myFilter" data-type="search">
+      </form> -->
+      <ul id="ul_list" data-role="listview" data-inset="true">
+      </ul>
+
+      <!--<input type="submit" onclick="edit_item();" value="Edit Item" />
+      <input type="submit" onclick="remove_item();" value="Remove Item" />-->
     </div>
   </div>
 
@@ -119,7 +182,7 @@
     <div data-role="header">
       <a href="#pagetwo" class="ui-btn ui-icon-home ui-btn-icon-left">Home</a>
       <h1>List</h1>
-      <a href="#pageone" class="ui-btn ui-btn-right ui-icon-action ui-btn-icon-right">Logout</a>
+      <a href="#homepage" class="ui-btn ui-btn-right ui-icon-action ui-btn-icon-right">Logout</a>
     </div>
 
     <div data-role="main" class="ui-content">
@@ -131,6 +194,7 @@
       <a href="javascript:change_master_password()" style="text-decoration: none"><button>Submit</button></a>
     </div>
   </div>
+
 
 </body>
 </html>
